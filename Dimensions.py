@@ -180,34 +180,6 @@ def create_multiple_dimensions(orientation):
         end[0] = 1 + 0.2
         create_dimension_line(start, end, "y")
 
-class CustomProperties(PropertyGroup):
-    scale: IntProperty(
-        name = "scale",
-        description = "Scale of drawing",
-        default = 50,
-        min = 1,
-        max = 5000
-        )
-
-    elitism: IntProperty(
-        name = "elitism",
-        description="Size of elitism for GA",
-        default = 2,
-        min = 1,
-        max = 100
-        )
-
-    forces: EnumProperty(
-        name="forces:",
-        description="Force types",
-        items=[
-                ("sigma", "Sigma", ""),
-                ("axial", "Axial", ""),
-                ("moment_y", "Moment Y", ""),
-                ("moment_z", "Moment Z", "")
-               ]
-        )
-
 class WM_OT_dimension_x(Operator):
     bl_label = "dimension_x"
     bl_idname = "wm.dimension_x"
@@ -216,7 +188,6 @@ class WM_OT_dimension_x(Operator):
     def execute(self, context):
         create_multiple_dimensions("x")
         return {"FINISHED"}
-
 
 class WM_OT_dimension_y(Operator):
     bl_label = "dimension_y"
@@ -236,9 +207,9 @@ class WM_OT_dimension_aligned(Operator):
         create_multiple_dimensions("aligned")
         return {"FINISHED"}
 
-class OBJECT_PT_CustomPanel(Panel):
+class OBJECT_PT_DimemsionsPanel(Panel):
     bl_label = "Dimensions"
-    bl_idname = "OBJECT_PT_custom_panel"
+    bl_idname = "OBJECT_PT_DimemsionsPanel"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Dimensions"
@@ -250,12 +221,6 @@ class OBJECT_PT_CustomPanel(Panel):
     def draw(self, context):
         layout = self.layout
         scene = context.scene
-        dimensions = scene.dimensions
-
-        # define scale
-        #box = layout.box()
-        #box.label(text="Scale:")
-        #box.operator("wm.set_structure", text="Set")
 
         box = layout.box()
         box.label(text="Dimensions:")
@@ -264,13 +229,11 @@ class OBJECT_PT_CustomPanel(Panel):
         box.operator("wm.dimension_aligned", text="aligned")
 
 classes = (
-    CustomProperties,
-
     WM_OT_dimension_x,
     WM_OT_dimension_y,
     WM_OT_dimension_aligned,
 
-    OBJECT_PT_CustomPanel
+    OBJECT_PT_DimemsionsPanel
 )
 
 
@@ -279,15 +242,10 @@ def register():
     for cls in classes:
         register_class(cls)
 
-    bpy.types.Scene.dimensions = PointerProperty(type=CustomProperties)
-
-
 def unregister():
     from bpy.utils import unregister_class
     for cls in reversed(classes):
         unregister_class(cls)
-
-    del bpy.types.Scene.dimensions
 
 if __name__ == "__main__":
     register()
