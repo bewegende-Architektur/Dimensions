@@ -253,8 +253,8 @@ class OBJECT_PT_CustomPanel(Panel):
         dimensions = scene.dimensions
 
         # define scale
-        box = layout.box()
-        box.label(text="Scale:")
+        #box = layout.box()
+        #box.label(text="Scale:")
         #box.operator("wm.set_structure", text="Set")
 
         box = layout.box()
