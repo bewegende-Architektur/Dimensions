@@ -16,12 +16,6 @@ from bpy.props import (IntProperty, FloatProperty, EnumProperty, PointerProperty
 from bpy.types import (Panel, Menu, Operator, PropertyGroup)
 
 def create_dimension_line(v_0, v_1, orientation):
-    mesh = bpy.data.meshes.new("<Bemaßungskette>")
-    obj = bpy.data.objects.new(mesh.name, mesh)
-    col = bpy.data.collections.get("Collection")
-    col.objects.link(obj)
-    bpy.context.view_layer.objects.active = obj
-
     # calculate distance, rotation and location of text
     if orientation == "aligned":
         r = math.atan2(v_1[1]-v_0[1], v_1[0]-v_0[0])
@@ -64,7 +58,7 @@ def create_dimension_line(v_0, v_1, orientation):
     polyline.points.add(1)
     polyline.points[0].co = line_h_s
     polyline.points[1].co = line_h_e
-    bpy.data.texts["Text.002"]
+
     # vertical and diagonal line at start
     line_v_s_0 = [s[0], s[1]-0.08, 0, 1]
     line_v_s_1 = [s[0], s[1]+0.08, 0, 1]
@@ -103,12 +97,13 @@ def create_dimension_line(v_0, v_1, orientation):
     obj = bpy.data.objects.new(name, curve)
 
     # link object to collection
-    bpy.data.collections["<Dimension>"].objects.link(obj)
+    bpy.context.scene.collection.objects.link(obj)
+    #bpy.data.collections["<Dimensions>"].objects.link(obj)
 
     # set rotaiton of dimension line
     obj.location = v_0
     obj.rotation_euler[2] = r
-    
+
     # apply extusion to render with freestyle
     obj.data.extrude = 0.001
 
@@ -124,7 +119,8 @@ def create_dimension_line(v_0, v_1, orientation):
     obj.scale = [0.1, 0.1, 0.1]
     obj.data.align_x = 'CENTER'
     obj.data.offset_y = 0.2
-    bpy.data.collections["<Dimension>"].objects.link(obj)
+    bpy.context.scene.collection.objects.link(obj)
+    #bpy.data.collections["<Dimension>"].objects.link(obj)
 
 def get_selected_points():
     # append all selected points to list
@@ -135,16 +131,16 @@ def get_selected_points():
             if v.select:
                 # absolute Position einfügen!
                 points.append(v.co)
-    
+
     return points
 
 def create_multiple_dimensions(orientation):
     points = get_selected_points()
     # sort points via position
-    
+
     if orientation == "aligned":
         sorted_points = points # works only for two points
-        
+
     if orientation == "x":
         sorted_points = sorted(points, key=itemgetter(0))
 
@@ -156,9 +152,9 @@ def create_multiple_dimensions(orientation):
         if point_id > 0:
             start = sorted_points[point_id-1].copy()
             end = sorted_points[point_id].copy()
-            
+
             if orientation == "aligned":
-                create_dimension_line(start, end, "aligned")                
+                create_dimension_line(start, end, "aligned")
 
             if orientation == "x":
                 start[1] = 10
@@ -172,7 +168,7 @@ def create_multiple_dimensions(orientation):
 
     # overall dimension
     start = sorted_points[0].copy()
-    end = sorted_points[len(sorted_points)-1].copy()        
+    end = sorted_points[len(sorted_points)-1].copy()
 
     if orientation == "x":
         start[1] = 10 + 0.2
